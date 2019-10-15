@@ -1,0 +1,13 @@
+architecture: ARCHITECTURE 
+creation_date: CREATION
+properties:
+  description: Void Linux (LIBC)
+  os: voidlinux
+  release: rolling
+templates:
+    /etc/hostname:
+        when:
+            - create
+            - copy
+            - rename
+        template: hostname.tpl
