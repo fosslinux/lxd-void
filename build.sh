@@ -17,8 +17,7 @@ usage() {
 }
 
 # cleanup from potential previous runs
-rm rootfs.tar.xz
-rm metadata.tar
+rm -f rootfs.tar.xz metadata.tar
 
 # option parsing
 while getopts ":l:m:a:n:" o ; do
