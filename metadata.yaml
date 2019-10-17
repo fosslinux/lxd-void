@@ -1,5 +1,5 @@
 architecture: ARCHITECTURE 
-creation_date: CREATION
+creation_date: CREATED
 properties:
   description: Void Linux (LIBC)
   os: voidlinux
