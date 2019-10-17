@@ -57,14 +57,18 @@ tar cf metadata.tar ${METADATA} template/
 aliasFallback="void-${libc}:${latest}"
 alias=${alias:-${aliasFallback}}
 
-# import into lxd
-# we want to avoid having to gain privileges
+# we want to avoid having to gain privileges when running lxd
 # if this is running as root, or the user is in the lxd group, then we do not
 # need to gain privileges
 # else, fall back to sudo
 
-if (id -nG | grep -qw "lxd") || [ $(id -u) -eq 1 ] ; then
-    lxc image import metadata.tar rootfs.tar.xz --alias ${alias}
-else
-    sudo lxc image import metadata.tar rootfs.tar.xz --alias ${alias}
-fi
+_lxd() {
+    if (id -nG | grep -qw "lxd") || [ $(id -u) -eq 1 ] ; then
+        lxc "$@"
+    else
+        sudo lxc "$@"
+    fi
+}
+
+# import the image we've made
+_lxd image import metadata.tar rootfs.tar.xz --alias ${alias}
