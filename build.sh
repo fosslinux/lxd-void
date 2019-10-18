@@ -59,8 +59,8 @@ while getopts ":l:m:a:n:" o ; do
             usage
             ;;
     esac
-    shift $((OPTIND-1))
 done
+shift $((OPTIND-1))
 
 # change values in metadata.yaml
 printf "Change values in metadata.yml: "
