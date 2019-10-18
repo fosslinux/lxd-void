@@ -1,23 +1,43 @@
 #!/usr/bin/env bash
 
+# default variables
 libc="glibc"
 mirror="http://alpha.de.repo.voidlinux.org"
 architecture="$(uname -m)"
 unix_time="$(date +%s)"
 
+# constants
 METADATA="metadata.yaml"
 
 # this is hardcoded only because the current/ link is broken
 # if there is a easy dynamic solution please open an issue
-latest="20190526"
+LATEST="20190526"
 
+# colours
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+NORMAL=$(tput sgr0)
+
+# functions
 usage() {
     echo "Usage: $0 [-l <musl|glibc>] [-m <mirror>] [-a <architecture>] [-n <alias>]" 1>&2
     exit 1
 }
 
+_ok() {
+    printf "${GREEN}OK${NORMAL}\n"
+}
+
+_fail() {
+    printf "${RED}FAILED${NORMAL}\n"
+    exit 1
+}
+
 # cleanup from potential previous runs
-rm -f rootfs.tar.xz metadata.tar
+printf "Clean up from (potential) previous runs of this script: "
+{
+    rm -f rootfs.tar.xz metadata.tar
+} > /dev/null 2>&1 && _ok || _fail
 
 # option parsing
 while getopts ":l:m:a:n:" o ; do
@@ -43,18 +63,27 @@ while getopts ":l:m:a:n:" o ; do
 done
 
 # change values in metadata.yaml
-sed -i "s/ARCHITECTURE/${architecture}/g" ${METADATA}
-sed -i "s/LIBC/${libc}/g" ${METADATA}
-sed -i "s/CREATED/${unix_time}/g" ${METADATA}
+printf "Change values in metadata.yml: "
+{
+    sed -i "s/ARCHITECTURE/${architecture}/g" ${METADATA}
+    sed -i "s/LIBC/${libc}/g" ${METADATA}
+    sed -i "s/CREATED/${unix_time}/g" ${METADATA}
+} > /dev/null 2>&1 && _ok || _fail
 
 # download rootfs
-wget -O rootfs.tar.xz "${mirror}/live/${latest}/void-${architecture}-ROOTFS-${latest}.tar.xz"
+printf "Download rootfs: "
+{
+    wget -O rootfs.tar.xz "${mirror}/live/${LATEST}/void-${architecture}-ROOTFS-${LATEST}.tar.xz"
+} > /dev/null 2>&1 && _ok || _fail
 
 # compress metadata
-tar cf metadata.tar ${METADATA} template/
+printf "Compress metadata: "
+{
+    tar cf metadata.tar ${METADATA} template/
+} > /dev/null 2>&1 && _ok || _fail
 
 # make an alias if it wasn't specified on command line
-aliasFallback="void-${libc}:${latest}"
+aliasFallback="void-${libc}:${LATEST}"
 alias=${alias:-${aliasFallback}}
 
 # we want to avoid having to gain privileges when running lxd
@@ -71,4 +100,7 @@ _lxd() {
 }
 
 # import the image we've made
-_lxd image import metadata.tar rootfs.tar.xz --alias ${alias}
+printf "Import image: "
+{
+    _lxd image import metadata.tar rootfs.tar.xz --alias ${alias}
+} > /dev/null 2>&1 && _ok || _fail
