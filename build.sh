@@ -83,7 +83,7 @@ printf "Compress metadata: "
 } > /dev/null 2>&1 && _ok || _fail
 
 # make an alias if it wasn't specified on command line
-aliasFallback="void-${libc}:${LATEST}"
+aliasFallback="void-${libc}"
 alias=${alias:-${aliasFallback}}
 
 # we want to avoid having to gain privileges when running lxd
