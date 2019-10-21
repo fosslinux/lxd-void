@@ -1,13 +1,13 @@
-architecture: ARCHITECTURE 
-creation_date: CREATED
+architecture: x86_64 
+creation_date: 1571702024
 properties:
-  description: Void Linux (LIBC)
+  description: Void Linux (glibc)
   os: voidlinux
   release: rolling
 templates:
-    /etc/hostname:
-        when:
-            - create
-            - copy
-            - rename
-        template: hostname.tpl
+  /etc/hostname:
+    when:
+      - create
+      - copy
+      - rename
+    template: hostname.tpl

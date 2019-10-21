@@ -79,7 +79,7 @@ printf "Download rootfs: "
 # compress metadata
 printf "Compress metadata: "
 {
-    tar cf metadata.tar ${METADATA} template/
+    tar cf metadata.tar ${METADATA} templates/
 } > /dev/null 2>&1 && _ok || _fail
 
 # make an alias if it wasn't specified on command line
