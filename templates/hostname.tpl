@@ -1,1 +1,1 @@
-hostname
+{{ container.name }}
