@@ -8,7 +8,8 @@ unix_time="$(date +%s)"
 
 # constants
 METADATA="metadata.yaml"
-ROOTFS="rootfs.tar.xz"
+ROOTFS="void-rootfs.tar.xz"
+LXD_ROOTFS="rootfs.tar.xz"
 
 # this is hardcoded only because the current/ link is broken
 # if there is a easy dynamic solution please open an issue
@@ -37,7 +38,7 @@ _fail() {
 # cleanup from potential previous runs
 printf "Clean up from (potential) previous runs of this script: "
 {
-    rm -rf rootfs/ metadata.tar
+    rm -rf rootfs/ metadata.tar ${LXD_ROOTFS}
 } > /dev/null 2>&1 && _ok || _fail
 
 # option parsing
@@ -79,6 +80,15 @@ if [ ! -f ${ROOTFS} ] ; then
     } > /dev/null 2>&1 && _ok || _fail
 fi
 
+printf "Modify rootfs: "
+mkdir rootfs
+cd rootfs
+tar xpf ../${ROOTFS}
+ln -s /etc/sv/dhcpcd-eth0 etc/runit/runsvdir/current/ # correct!
+tar cJpf ../${LXD_ROOTFS} *
+cd ..
+_ok
+
 # compress metadata
 printf "Compress metadata: "
 {
@@ -105,5 +115,5 @@ _lxd() {
 # import the image we've made
 printf "Import image: "
 {
-    _lxd image import metadata.tar ${ROOTFS} --alias ${alias}
+    _lxd image import metadata.tar ${LXD_ROOTFS} --alias ${alias}
 } > /dev/null 2>&1 && _ok || _fail
