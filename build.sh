@@ -36,7 +36,7 @@ _fail() {
 # cleanup from potential previous runs
 printf "Clean up from (potential) previous runs of this script: "
 {
-    rm -f rootfs.tar.xz metadata.tar
+    rm -f metadata.tar
 } > /dev/null 2>&1 && _ok || _fail
 
 # option parsing
@@ -71,10 +71,12 @@ printf "Change values in metadata.yml: "
 } > /dev/null 2>&1 && _ok || _fail
 
 # download rootfs
-printf "Download rootfs: "
-{
-    wget -O rootfs.tar.xz "${mirror}/live/${LATEST}/void-${architecture}-ROOTFS-${LATEST}.tar.xz"
-} > /dev/null 2>&1 && _ok || _fail
+if [ ! -f rootfs.tar.xz ] ; then
+    printf "Download rootfs: "
+    {
+        wget -O rootfs.tar.xz "${mirror}/live/${LATEST}/void-${architecture}-ROOTFS-${LATEST}.tar.xz"
+    } > /dev/null 2>&1 && _ok || _fail
+fi
 
 # compress metadata
 printf "Compress metadata: "
