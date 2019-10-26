@@ -8,6 +8,7 @@ unix_time="$(date +%s)"
 
 # constants
 METADATA="metadata.yaml"
+ROOTFS="rootfs.tar.xz"
 
 # this is hardcoded only because the current/ link is broken
 # if there is a easy dynamic solution please open an issue
@@ -36,7 +37,7 @@ _fail() {
 # cleanup from potential previous runs
 printf "Clean up from (potential) previous runs of this script: "
 {
-    rm -f metadata.tar
+    rm -rf rootfs/ metadata.tar
 } > /dev/null 2>&1 && _ok || _fail
 
 # option parsing
@@ -71,10 +72,10 @@ printf "Change values in metadata.yml: "
 } > /dev/null 2>&1 && _ok || _fail
 
 # download rootfs
-if [ ! -f rootfs.tar.xz ] ; then
+if [ ! -f ${ROOTFS} ] ; then
     printf "Download rootfs: "
     {
-        wget -O rootfs.tar.xz "${mirror}/live/${LATEST}/void-${architecture}-ROOTFS-${LATEST}.tar.xz"
+        wget -O ${ROOTFS} "${mirror}/live/${LATEST}/void-${architecture}-ROOTFS-${LATEST}.tar.xz"
     } > /dev/null 2>&1 && _ok || _fail
 fi
 
@@ -104,5 +105,5 @@ _lxd() {
 # import the image we've made
 printf "Import image: "
 {
-    _lxd image import metadata.tar rootfs.tar.xz --alias ${alias}
+    _lxd image import metadata.tar ${ROOTFS} --alias ${alias}
 } > /dev/null 2>&1 && _ok || _fail
